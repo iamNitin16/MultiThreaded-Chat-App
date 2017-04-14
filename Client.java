@@ -18,8 +18,12 @@ class Client extends JFrame implements ActionListener{
 	private Socket socket=null;
 	private DataInputStream din;
 	private DataOutputStream dout;
+	private JOptionPane joptionpane;
+	private DefaultListModel<String> messages;
 
 	Client(){
+		messages = new DefaultListModel<>();
+
 		l_server_ip = new JLabel("Server IP :- ");
 		l_server_ip.setBounds(50,20,100,30);
 
@@ -42,7 +46,7 @@ class Client extends JFrame implements ActionListener{
 		txt_username = new JTextField();
 		txt_username.setBounds(330,80,200,30);
 
-		chat_box = new JList();
+		chat_box = new JList(messages);
 		chat_box.setBounds(100,150,500,400);
 		// chat_box.setEditable(false);
 
@@ -81,12 +85,47 @@ class Client extends JFrame implements ActionListener{
 		add(connect);
 	}
 
+	public boolean isConnected(){
+		if(socket == null){
+			return false;
+		}
+		return true;
+	}
+
 	public void actionPerformed(ActionEvent ae){
 		if(send_message == ae.getSource()){
-
+			String message = "";
+			try{
+				while(!message.equals("stop")){
+					message = txt_message.getText();
+					dout.writeUTF(message);
+					txt_message.setText(null);
+					messages.addElement("me :- "+message);
+					message = din.readUTF();
+					messages.addElement("server :- "+message);
+				}
+			}catch(Exception e){
+				System.out.println(e);
+			}
 		}
 		else if(connect == ae.getSource()){
-
+			String host_ip = txt_server_ip.getText();
+			int host_port = Integer.parseInt(txt_server_port.getText());
+			try{
+				socket = new Socket(host_ip,host_port);
+				din = new DataInputStream(socket.getInputStream());
+				dout = new DataOutputStream(socket.getOutputStream());
+			}catch(Exception e){
+				System.out.println(e);
+			}
+			if(isConnected()){
+				System.out.println("Connected");
+				send_message.setEnabled(true);
+			}
+			else{
+				System.out.println("Not Connected");
+				joptionpane.showMessageDialog(null, "Unable to Connect...please check your server ip and port and try again......");
+			}
 		}
 	}
 
