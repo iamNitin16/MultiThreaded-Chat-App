@@ -94,16 +94,12 @@ class Client extends JFrame implements ActionListener{
 
 	public void actionPerformed(ActionEvent ae){
 		if(send_message == ae.getSource()){
-			String message = "";
+			String message = txt_message.getText();
 			try{
-				while(!message.equals("stop")){
-					message = txt_message.getText();
-					dout.writeUTF(message);
-					txt_message.setText(null);
-					messages.addElement("me :- "+message);
-					message = din.readUTF();
-					messages.addElement("server :- "+message);
-				}
+				dout.writeUTF(message);
+				txt_message.setText(null);
+				messages.addElement("me :- "+message);
+				dout.flush();
 			}catch(Exception e){
 				System.out.println(e);
 			}
