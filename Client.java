@@ -127,5 +127,22 @@ class Client extends JFrame implements ActionListener{
 
 	public static void main(String args[]){
 		Client obj = new Client();
+		Client.Listening servermsg = obj.new Listening();
+		servermsg.start();
+	}
+
+	class Listening extends Thread{
+		public void run(){
+			while(true){
+				try{
+					String msg = din.readUTF();
+					if(msg != null){
+						messages.addElement("server :- "+msg);
+					}
+				}catch(Exception e){
+					// System .out.println(e);
+				}
+			}
+		}
 	}
 }
